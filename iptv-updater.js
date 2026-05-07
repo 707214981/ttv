@@ -1,6 +1,6 @@
 const fs = require('fs');
 
-// 🌐 数据源列表（可自由增删）
+// 🌐 数据源列表
 const SOURCES = [
   'https://raw.githubusercontent.com/YueChan/Live/main/APTV.m3u',
   'https://raw.githubusercontent.com/iptv-org/iptv/master/streams/cn.m3u',
@@ -9,23 +9,30 @@ const SOURCES = [
   'https://raw.githubusercontent.com/kimwang1978/collect-tv-txt/main/merged_output.txt'
 ];
 
-// 📥 抓取源内容
+// 📥 抓取源内容（失败时返回空字符串，绝不返回数组）
 async function fetchSource(url) {
   try {
     const res = await fetch(url, { 
       signal: AbortSignal.timeout(10000), 
       headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)' } 
     });
-    if (!res.ok) return [];
-    return await res.text();
-  } catch { return []; }
+    if (!res.ok) return '';
+    const text = await res.text();
+    return typeof text === 'string' ? text : '';
+  } catch (e) { 
+    console.warn(`⚠️ 抓取失败: ${url} | ${e.message}`);
+    return ''; 
+  }
 }
 
-// 🛠 混合解析（M3U/TXT）
+// 🛠 混合解析（增加类型防御）
 function parseContent(text) {
+  if (typeof text !== 'string' || !text.trim()) return [];
+  
   const lines = text.split('\n');
   const channels = [];
   let curName = '', curUrl = '', curLogo = '';
+
   for (let line of lines) {
     line = line.trim();
     if (line.startsWith('#EXTINF:')) {
@@ -39,9 +46,11 @@ function parseContent(text) {
         channels.push({ name: curName, url: curUrl, logo: curLogo });
         curName = ''; curUrl = ''; curLogo = '';
       }
-    } else if (line.includes(',')) {
-      const [name, url] = line.split(',').map(s => s.trim());
-      if (name && url && url.match(/^https?:\/\//)) {
+    } else if (line.includes(',') && line.match(/^https?:\/\//)) {
+      const parts = line.split(',');
+      const url = parts[parts.length - 1].trim();
+      const name = parts.slice(0, -1).join(',').trim();
+      if (name && url.match(/^https?:\/\//)) {
         channels.push({ name, url, logo: '' });
       }
     }
@@ -54,6 +63,7 @@ async function testStream(url) {
   try {
     const headRes = await fetch(url, { method: 'HEAD', signal: AbortSignal.timeout(5000), redirect: 'follow' });
     if (headRes.ok || [301,302,307,308].includes(headRes.status)) return true;
+    
     const getRes = await fetch(url, { method: 'GET', signal: AbortSignal.timeout(3000), redirect: 'follow' });
     return getRes.ok || [301,302,307,308].includes(getRes.status);
   } catch { return false; }
@@ -76,8 +86,11 @@ function getGroup(name) {
 async function main() {
   console.log('📡 Fetching sources...');
   const rawTexts = await Promise.all(SOURCES.map(fetchSource));
-  let allChannels = rawTexts.flatMap(parseContent);
-  console.log(`📊 Raw: ${allChannels.length}`);
+  
+  // 🛡️ 严格过滤非字符串或空内容，彻底杜绝 split 报错
+  const validTexts = rawTexts.filter(t => typeof t === 'string' && t.trim().length > 0);
+  let allChannels = validTexts.flatMap(parseContent);
+  console.log(`📊 Raw Channels: ${allChannels.length} (from ${validTexts.length}/${SOURCES.length} sources)`);
 
   // 去重
   const dedupMap = new Map();
@@ -88,7 +101,7 @@ async function main() {
   const unique = Array.from(dedupMap.values());
   console.log(`✅ Deduped: ${unique.length}`);
 
-  // 分批测活（避免 GitHub Runner 网络限流）
+  // 分批测活
   console.log('🔍 Testing availability...');
   const batchSize = 60;
   const valid = [];
@@ -96,9 +109,9 @@ async function main() {
     const batch = unique.slice(i, i + batchSize);
     const results = await Promise.all(batch.map(async ch => (await testStream(ch.url)) ? ch : null));
     valid.push(...results.filter(Boolean));
-    console.log(`   ${Math.min(i + batchSize, unique.length)}/${unique.length}`);
+    console.log(`   Progress: ${Math.min(i + batchSize, unique.length)}/${unique.length}`);
   }
-  console.log(`🟢 Valid: ${valid.length}`);
+  console.log(`🟢 Valid Streams: ${valid.length}`);
 
   // 分组排序
   const grouped = {};
@@ -126,7 +139,7 @@ async function main() {
     }
   }
   fs.writeFileSync('live.m3u', m3u.trim());
-  console.log('📦 Saved live.txt & live.m3u');
+  console.log('📦 Successfully saved live.txt & live.m3u');
 }
 
-main().catch(e => { console.error(e); process.exit(1); });
+main().catch(e => { console.error('❌ Fatal Error:', e); process.exit(1); });
