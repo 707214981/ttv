@@ -763,10 +763,6 @@ http://[2409:8087:8:21::18]:6610/otttv.bj.chinamobile.com/PLTV/88888888/224/3221
 http://tv.20191209.xyz:37377/migu/641886773.m3u8?migutoken=dfc218ce4c1ff00475c0aef03e0b883bf8a277b36671d5ca1eb7cc5f7ce7919d01ee050351170891d6e103aa7adea25827c13c901ccf6cdf4a8a370e7fd90c8b198dcb1e8814bbf2ed4fb0c8
 #EXTINF:-1 group-title="体育" tvg-name="CCTV-5+ 体育赛事",CCTV-5+ 体育赛事
 http://148.135.93.213:81/live.php?id=CCTV5p
-#EXTINF:-1 group-title="体育" tvg-name="CCTV-5 (1080p)",CCTV-5 (1080p)
-http://192.151.150.154/live/cctv5hd.m3u8
-#EXTINF:-1 group-title="体育" tvg-name="CCTV-5+ (720p)",CCTV-5+ (720p)
-http://192.151.150.154/live/cctv5p.m3u8
 #EXTINF:-1 group-title="体育" tvg-name="五星体育 (720p)",五星体育 (720p)
 http://223.110.245.147/ott.js.chinamobile.com/PLTV/3/224/3221226799/index.m3u8
 #EXTINF:-1 group-title="体育" tvg-name="山东体育 (1080p) [Geo-blocked]",山东体育 (1080p) [Geo-blocked]
@@ -1289,8 +1285,6 @@ http://110.153.180.106:55555/out_2/index.m3u8
 http://120.70.60.179:9901/tsfile/live/1006_1.m3u8?authid=0&key=txiptv&playlive=1
 #EXTINF:-1 group-title="地方台" tvg-name="Xinjiang TV 3",Xinjiang TV 3
 http://218.84.35.38:3000/m3u8/live/tctv-2/index.m3u8
-#EXTINF:-1 group-title="地方台" tvg-name="Xinjiang TV 5",Xinjiang TV 5
-http://106.124.91.222:9901/tsfile/live/21216_1.m3u8?authid=0&key=txiptv&playlive=0
 #EXTINF:-1 group-title="地方台" tvg-name="Xinjiang TV 8",Xinjiang TV 8
 http://120.70.60.179:9901/tsfile/live/1002_1.m3u8?authid=0&key=txiptv&playlive=1
 #EXTINF:-1 group-title="地方台" tvg-name="Xizang TV Tibetan (720p) [Not 24/7]",Xizang TV Tibetan (720p) [Not 24/7]
@@ -1319,8 +1313,6 @@ http://33809.hlsplay.aodianyun.com/guangdianyun_33809/tv_channel_171.m3u8
 http://tvdrs.wsrtv.com.cn:8100/channellive/ch2.flv
 #EXTINF:-1 group-title="地方台" tvg-name="云南 Ⅰ 文山综合台 (1080p) [Not 24/7]",云南 Ⅰ 文山综合台 (1080p) [Not 24/7]
 http://tvdrs.wsrtv.com.cn:8100/channellive/ch1.flv
-#EXTINF:-1 group-title="地方台" tvg-name="云南都市 (1080p)",云南都市 (1080p)
-http://39.130.202.81:6610/gitv_live/G_YNTV-2-HD/G_YNTV-2-HD.m3u8
 #EXTINF:-1 group-title="地方台" tvg-name="亚太台 (480p)",亚太台 (480p)
 http://174.127.67.246/live330/playlist.m3u8
 #EXTINF:-1 group-title="地方台" tvg-name="交城電視台 (576p)",交城電視台 (576p)
